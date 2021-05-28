@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1">
+    <style>
+        body {
+            height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        
+        div.content {
+            height: 100%;
+        }
+        
+        div.spacer {
+            height: 1px;
+        }
+    </style>
+</head>
+
+<body onresize="resize()">
+
+    <canvas id="myCanvas" style="border:2px solid red;">
+</canvas>
+    <p id="footer"></p>
+    <p id='info'></p>
+</body>
+
+</html>
+
+<script>
+    function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        var expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
+    if (getCookie("tktgenerated") == "Yes") {
+        window.alert("A ticket has already generated!, close browser to reset.");
+        document.getElementById("footer").innerHTML = "Sorry...";
+        window.close();
+    } else {
+        //setCookie("tktgenerated", "Yes", 0)
+        document.cookie = "tktgenerated=Yes";
+
+        Number.prototype.pad = function(size) {
+            var s = String(this);
+            while (s.length < (size || 2)) {
+                s = "0" + s;
+            }
+            return s;
+        }
+
+
+        let current = new Date();
+        var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        let cDate = days[current.getDay()] + " " + current.getDate().pad(2) + '-' + (current.getMonth() + 1).pad(2) + '-' + current.getFullYear();
+        let cTime = current.getHours().pad(2) + ":" + current.getMinutes().pad(2) + ":" + current.getSeconds().pad(2);
+        let dateTime = cDate + ' ' + cTime;
+        let tktnum = String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90))
+        document.getElementById("footer").innerHTML = "Ticket #" + tktnum + " generated on: " + dateTime + ", (c) Murtuza Masalawala";
+        document.getElementById("info").innerHTML = "Tap on cell to mark Number, swipe on line to mark as complete."
+            // setting canvas size. 
+        var ticket = getTicket();
+        var checked = initialiseArrays(28);
+        var linedRow = initialiseArrays(3);
+        var x, y, z;
+        var startX, startY;
+
+        resize();
+
+        var canvas;
+        var context;
+        var padx, pady, cellw, cellh;
+
+
+        function initialiseArrays(size) {
+            var arr = [];
+            for (i = 0; i < size; i++) {
+                arr[i] = false;
+            }
+            return arr;
+        }
+
+        function resize() {
+
+            canvas = document.getElementById('myCanvas');
+            context = canvas.getContext('2d');
+
+            var screenWidth = document.documentElement.clientWidth - 10;
+            var screenHeight = document.documentElement.clientHeight - 60;
+
+            context.clearRect(0, 0, screenWidth, screenHeight);
+
+            if (screenHeight > 360) {
+                screenHeight = 360;
+            }
+            context.canvas.width = screenWidth;
+            context.canvas.height = screenHeight;
+            context.lineWidth = 3;
+            context.strokeStyle = '#19B7F1';
+
+            padx = 10;
+            pady = 10;
+            cellw = (screenWidth - 2 * padx) / 9;
+            cellh = (screenHeight - 2 * pady) / 3;
+            var idx = 0;
+            var num;
+            for (j = 0; j < 9; j++) {
+                for (i = 0; i < 3; i++) {
+                    x = j * cellw + padx;
+                    y = i * cellh + pady;
+                    context.lineWidth = 3;
+                    context.strokeStyle = '#19B7F1';
+                    context.rect(x, y, cellw, cellh);
+                    context.stroke();
+                    if (checked[idx]) {
+                        context.fillStyle = "yellow";
+                        context.fillRect(x, y, cellw, cellh);
+                    }
+                    context.font = "40px Arial";
+                    num = ticket[idx];
+                    if (num == 0) num = '';
+                    context.fillStyle = "black";
+                    z = (cellw - context.measureText(num).width) / 2;
+                    context.fillText(num, x + z, y + cellh - 15);
+                    idx++;
+                }
+            }
+            // draw lines
+            context.stroke();
+            for (i = 0; i < 3; i++) {
+                if (linedRow[i]) drawLine(i);
+            }
+
+        }
+
+        canvas.onclick = function(event) {
+            // get canvas size and position
+            var boundingRect = canvas.getBoundingClientRect(); // turn this on for Desktop
+            // translate mouse event coordinates to canvas coordinates
+            x = (event.clientX - boundingRect.left) * (canvas.width / boundingRect.width); // turn this on for Desktop
+            y = (event.clientY - boundingRect.top) * (canvas.height / boundingRect.height); // turn this on for Desktop
+            markCell();
+        }
+
+        function checkPointinCanvas(x, y) {
+            return (x >= 0 && x < cellw * 9 && y >= 0 && y <= cellh * 3);
+        }
+
+        function markCell() {
+            var x1, y1;
+            var idx;
+            var num;
+
+            if (checkPointinCanvas(x, y)) {
+                j = Math.trunc((x - padx) / cellw);
+                i = Math.trunc((y - pady) / cellh);
+                x1 = j * cellw + padx;
+                y1 = i * cellh + pady;
+                idx = j * 3 + i;
+                num = ticket[idx];
+                if (num != 0) {
+                    if (checked[idx]) {
+                        context.fillStyle = "white";
+                    } else {
+                        context.fillStyle = "yellow";
+                    }
+                    //context.lineWidth =0;
+                    context.fillRect(x1 + 2, y1 + 2, cellw - 4, cellh - 4);
+                    context.fillStyle = "black";
+                    z = (cellw - context.measureText(num).width) / 2;
+                    context.fillText(num, x1 + z, y1 + cellh - 15);
+                    checked[idx] = !checked[idx];
+                    // window.alert (checked[idx] + ", " + linedRow[i]);
+                    if (!checked[idx] && linedRow[i]) {
+                        linedRow[i] = false;
+                        resize();
+                    }
+                }
+            }
+        };
+
+        function getTicket() {
+            var tkt = [];
+            var zero3 = [];
+            var text = '';
+            var i, j;
+            var min, max, idx;
+            var limitRow = [0, 0, 0];
+            var limitCol, cnt;
+            // Using a one dimensional array where index 0-2 is column 1 and so on.
+            // Get 3 random unique integers for each column
+            // first column is 1-10, 2nd is 11-20 and so on.
+            for (j = 0; j < 9; j++) {
+                min = j * 10 + 1;
+                max = 10 * (j + 1);
+                for (i = j * 3; i < j * 3 + 3; i++) {
+                    tkt[i] = getRndInteger(min, max);
+                    if (i == j * 3 + 1) {
+                        while (tkt[i] == tkt[i - 1]) {
+                            tkt[i] = getRndInteger(min, max);
+                        }
+                    }
+                    if (i == j * 3 + 2) {
+                        while (tkt[i] == tkt[i - 1] || tkt[i] == tkt[i - 2]) {
+                            tkt[i] = getRndInteger(min, max);
+                        }
+                    }
+                }
+            }
+
+            // sort the array as each column should have numbers in ascending order. 
+            tkt.sort(function(a, b) {
+                return a - b
+            });
+
+            // as now we have 27 random unique numbers but we need only 15 numbers
+            // on the ticket, so setting one random cell in each column to 0.
+            for (j = 0; j < 4; j++) {
+                idx = getRndInteger(j * 3, j * 3 + 2);
+                tkt[idx] = 0;
+                limitRow[idx % 3]++;
+            }
+            for (j = 4; j < 9; j++) {
+                do {
+                    idx = getRndInteger(j * 3, j * 3 + 2);
+                } while (limitRow[idx % 3] >= 4);
+                tkt[idx] = 0;
+                limitRow[idx % 3]++;
+            }
+            // scan each cell whether it is zero, if not check whether the row has already 4 zeros, and ensure that the column has atleast one
+            // number before setting the cell to zero. 
+            cnt = 0;
+            for (j = 0; j < 9; j++) {
+                if (cnt == 3) {
+                    break
+                }
+                limitCol = 1;
+                for (i = 0; i < 3; i++) {
+                    if (cnt == 3 || limitCol == 2) {
+                        break
+                    }
+                    if (tkt[j * 3 + i] != 0 && limitCol < 2 && limitRow[i] < 4) {
+                        tkt[j * 3 + i] = 0;
+                        limitRow[i]++;
+                        limitCol++;
+                        cnt++;
+                    }
+                }
+            }
+            return tkt;
+        }
+
+
+        function drawLine(i) {
+            var lx1, ly1, lx2;
+            lx1 = padx;
+            ly1 = (i * cellh) + (cellh / 2) + pady;
+            lx2 = context.canvas.width - padx;
+
+            var startX = lx1;
+            var startY = ly1;
+            var zigzagSpacing = 10;
+
+            context.lineWidth = 4;
+            context.strokeStyle = "orange";
+            context.beginPath();
+            context.moveTo(startX, startY);
+
+            // draw ten lines
+            n = 0;
+            do {
+                var x = startX + ((n + 1) * zigzagSpacing);
+                var y;
+
+                if (n % 2 == 0) { // if n is even...
+                    y = startY + 10;
+                } else { // if n is odd...
+                    y = startY;
+                }
+                context.lineTo(x, y);
+                n++;
+            } while (x <= lx2 - zigzagSpacing);
+            context.stroke();
+
+        }
+
+        function getRndInteger(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        window.addEventListener('load', function() {
+
+                var touchsurface = document.getElementById('myCanvas'),
+
+                    dist,
+                    threshold = cellw * 2, //required min distance traveled to be considered swipe
+                    allowedTime = 750, // maximum time allowed to travel that distance
+                    elapsedTime,
+                    startTime;
+
+                function handleswipe(isrightswipe) {
+
+                    if (isrightswipe) {
+                        //Use has made a right swipe! ' + startX + ", " + startY);
+                        x = startX;
+                        y = startY;
+
+                        if (checkPointinCanvas(x, y)) {
+                            i = Math.trunc((y - pady) / cellh);
+
+                            var flag = true;
+                            var idx;
+
+                            for (j = 0; j < 9; j++) {
+                                idx = j * 3 + i;
+                                if (!checked[idx] && ticket[idx] != 0) {
+                                    flag = false;
+                                    break;
+                                }
+                            }
+
+                            if (flag) {
+                                linedRow[i] = true;
+                                drawLine(i);
+                            }
+                        }
+
+                    } else {
+                        x = startX;
+                        y = startY;
+                        markCell();
+                    }
+                }
+
+                touchsurface.addEventListener('touchstart', function(e) {
+                    touchsurface.innerHTML = '';
+                    var touchobj = e.changedTouches[0];
+                    dist = 0;
+                    startX = touchobj.pageX;
+                    startY = touchobj.pageY;
+                    startTime = new Date().getTime(); // record time when finger first makes contact with surface
+                    e.preventDefault();
+                }, false)
+
+                touchsurface.addEventListener('touchmove', function(e) {
+                    e.preventDefault(); // prevent scrolling when inside DIV
+                }, false)
+
+                touchsurface.addEventListener('touchend', function(e) {
+                    var touchobj = e.changedTouches[0];
+                    dist = touchobj.pageX - startX; // get total dist traveled by finger while in contact with surface
+                    elapsedTime = new Date().getTime() - startTime; // get time elapsed
+                    // check that elapsed time is within specified, horizontal dist traveled >= threshold, and vertical dist traveled <= 100
+                    var swiperightBol = (elapsedTime <= allowedTime && dist >= threshold && Math.abs(touchobj.pageY - startY) <= 100);
+                    handleswipe(swiperightBol);
+                    e.preventDefault();
+                }, false)
+
+            }, false) // end window.onload
+
+
+    } // if no other tab is open continue.
+</script>

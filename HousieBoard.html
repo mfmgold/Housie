@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1">
+    <style>
+        body {
+            height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        
+        div.content {
+            height: 100%;
+        }
+        
+        div.spacer {
+            height: 1px;
+        }
+    </style>
+</head>
+
+<body onresize="resize()">
+
+    <canvas id="myCanvas" style="border:1px solid red;">
+</canvas>
+    <p id="footer"></p>
+
+</body>
+
+</html>
+
+<script>
+    Number.prototype.pad = function(size) {
+        var s = String(this);
+        while (s.length < (size || 2)) {
+            s = "0" + s;
+        }
+        return s;
+    }
+
+
+    let current = new Date();
+    var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    let cDate = days[current.getDay()] + " " + current.getDate().pad(2) + '-' + (current.getMonth() + 1).pad(2) + '-' + current.getFullYear();
+    let cTime = current.getHours().pad(2) + ":" + current.getMinutes().pad(2) + ":" + current.getSeconds().pad(2);
+    let dateTime = cDate + ' ' + cTime;
+    let tktnum = String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90))
+    document.getElementById("footer").innerHTML = "Board #" + tktnum + " generated on: " + dateTime + ", (c) Murtuza Masalawala";
+
+    // setting canvas size. 
+
+    var x, y, z;
+    resize();
+    var canvas;
+    var context;
+    var padx, pady, cellw, cellh;
+    var checked = [];
+    for (i = 0; i < 90; i++) {
+        checked[i] = false;
+    }
+
+    function resize() {
+
+        canvas = document.getElementById('myCanvas');
+        context = canvas.getContext('2d');
+        var screenWidth = document.documentElement.clientWidth - 10;
+        var screenHeight = document.documentElement.clientHeight - 60;
+        context.canvas.width = screenWidth;
+        context.canvas.height = screenHeight;
+
+        padx = 10;
+        pady = 10;
+        cellw = (screenWidth - 2 * padx) / 10;
+        cellh = (screenHeight - 2 * pady) / 9;
+
+        var idx = 0;
+        for (j = 0; j < 9; j++) {
+            for (i = 0; i < 10; i++) {
+                idx++;
+                x = i * cellw + padx;
+                y = j * cellh + pady;
+                context.rect(x, y, cellw, cellh);
+                context.font = "40px Arial";
+                z = (cellw - context.measureText(idx).width) / 2;
+                context.fillText(idx, x + z, y + cellh - 15);
+            }
+        }
+
+        context.strokeStyle = '#19B7F1';
+        context.stroke();
+    }
+    canvas.onclick = function(event) {
+        // get canvas size and position
+        var boundingRect = canvas.getBoundingClientRect();
+        // translate mouse event coordinates to canvas coordinates
+        var x = (event.clientX - boundingRect.left) * (canvas.width / boundingRect.width);
+        var y = (event.clientY - boundingRect.top) * (canvas.height / boundingRect.height);
+
+        var x1, y1;
+        var idx;
+        var num;
+        if (context.isPointInPath(x, y)) {
+            i = Math.trunc((x - padx) / cellw);
+            j = Math.trunc((y - pady) / cellh);
+            x1 = i * cellw + padx;
+            y1 = j * cellh + pady;
+            idx = j * 10 + i + 1;
+            if (checked[idx]) {
+                context.fillStyle = "white";
+            } else {
+                context.fillStyle = "yellow";
+            }
+            context.fillRect(x1 + 1, y1 + 1, cellw - 2, cellh - 2);
+            context.fillStyle = "black";
+            z = (cellw - context.measureText(idx).width) / 2;
+            context.fillText(idx, x1 + z, y1 + cellh - 15);
+            checked[idx] = !checked[idx];
+        }
+    };
+
+
+    function getRndInteger(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+</script>
