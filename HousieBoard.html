@@ -26,7 +26,6 @@
     <button id='button' onclick="playPause();">PLAY</button>
     <p style="font-size: 20px;color:black;position:absolute; top:95% " ; id='footer'></p>
     <button id='popupbox'></button>
-    <p id='debug'>Test</p>
 </body>
 
 </html>
@@ -129,7 +128,6 @@
             context.fillText(idx, x1 + z, y1 + cellh - 15);
             checked[idx] = !checked[idx];
             checked[idx] ? ++countMarkedCells : --countMarkedCells; // if cell is unmarked then reduce the count
-            document.getElementById('debug').innerHTML = countMarkedCells;
         }
     };
 
@@ -180,7 +178,6 @@
         checked[num] = !checked[num];
         // checked[num] ? ++countMarkedCells : --countMarkedCells; // if cell is unmarked then reduce the count
         ++countMarkedCells;
-        document.getElementById('debug').innerHTML = countMarkedCells;
         // display number in a pop up box 
         document.getElementById('popupbox').innerHTML = num;
         $("#popupbox").fadeIn();
