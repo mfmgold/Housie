@@ -22,13 +22,11 @@
 </head>
 
 <body onresize="resize()">
-
-    <canvas id="myCanvas" style="border:1px solid red;">
-</canvas>
-    <button id="button" onclick="playPause(); ">PLAY</button>
-    <p style="font-size: 20px;color:black;position:absolute; top:95% " ; id="footer "></p>
-    <button id="popupbox">/button>
-
+    <canvas id="myCanvas" style="border:1px solid red;"></canvas>
+    <button id='button' onclick="playPause();">PLAY</button>
+    <p style="font-size: 20px;color:black;position:absolute; top:95% " ; id='footer'></p>
+    <button id='popupbox'></button>
+    <p id='debug'>Test</p>
 </body>
 
 </html>
@@ -46,11 +44,11 @@
 
     let current = new Date();
     let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    let cDate = days[current.getDay()] + " " + current.getDate().pad(2) + '-' + (current.getMonth() + 1).pad(2) + '-' + current.getFullYear();
-    let cTime = current.getHours().pad(2) + ':' + current.getMinutes().pad(2) + ':' + current.getSeconds().pad(2);
+    let cDate = days[current.getDay()] + " " + current.getDate().pad(2) + '- ' + (current.getMonth() + 1).pad(2) + '- ' + current.getFullYear();
+    let cTime = current.getHours().pad(2) + ':' + current.getMinutes().pad(2) + ': ' + current.getSeconds().pad(2);
     let dateTime = cDate + ' ' + cTime;
     let tktnum = String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90))
-    document.getElementById("footer ").innerHTML = " Board # " + tktnum + " generated on: " + dateTime + ", (c) Murtuza Masalawala - ver: " + version;
+    document.getElementById('footer').innerHTML = " Board # " + tktnum + " generated on: " + dateTime + ", (c) Murtuza Masalawala - ver: " + version;
 
     // setting canvas size. 
 
@@ -73,10 +71,10 @@
         context.canvas.width = screenWidth;
         context.canvas.height = screenHeight;
 
-        document.getElementById('button').style = "height:50px;width:300px;font-size: 24px;background-color: #19B7F1;border: 2px solid #008CBA;position:absolute;left: " + (((document.documentElement.clientWidth / 2 - 150) / document.documentElement.clientWidth) * 100) + "%;top:" + (((screenHeight / document.documentElement.clientHeight) * 100) + 1) + "%";
+        document.getElementById('button').style = "height:50px;width:300px;font-size: 24px;background-color: #19B7F1;border: 2px solid #008CBA;position:absolute;left:" + (((document.documentElement.clientWidth / 2 - 150) / document.documentElement.clientWidth) * 100) + "%;top:" + (((screenHeight / document.documentElement.clientHeight) * 100) + 1) + "%";
 
-        document.getElementById('popupbox').style = "visibility:;height:" + screenHeight/4 + "px;width:" + screenWidth/4 +"px;font-size: 72px;background-color: yellow;border: 2px solid #008CBA;position:absolute;left: " + (((document.documentElement.clientWidth / 2 - (screenWidth/8)) / document.documentElement.clientWidth) * 100) + "%;top:" + (((document.documentElement.clientHeight / 2 - (screenHeight/8)) / document.documentElement.clientHeight) * 100 ) + "%";
-        document.getElementById('popupbox').innerHTML="Hello!"
+        document.getElementById('popupbox').style = "visibility:;height:" + screenHeight / 4 + "px;width:" + screenWidth / 4 + "px;font-size: 72px;background-color: yellow;border: 2px solid #008CBA;position:absolute;left:        " + (((document.documentElement.clientWidth / 2 - (screenWidth / 8)) / document.documentElement.clientWidth) * 100) + "%; top:" + (((document.documentElement.clientHeight / 2 - (screenHeight / 8)) / document.documentElement.clientHeight) * 100) + "%";
+        document.getElementById('popupbox').innerHTML = 'Hello!';
         $("#popupbox").fadeOut(2000);
         window.speechSynthesis.speak(new SpeechSynthesisUtterance('Hello!'));
 
@@ -113,7 +111,7 @@
 
         let idx;
         let num;
-        // fill selected cells
+        // mark selected cell
         if (context.isPointInPath(x, y)) {
             let row = Math.trunc((x - padx) / cellw);
             let col = Math.trunc((y - pady) / cellh);
@@ -130,6 +128,8 @@
             z = (cellw - context.measureText(idx).width) / 2;
             context.fillText(idx, x1 + z, y1 + cellh - 15);
             checked[idx] = !checked[idx];
+            checked[idx] ? ++countMarkedCells : --countMarkedCells; // if cell is unmarked then reduce the count
+            document.getElementById('debug').innerHTML = countMarkedCells;
         }
     };
 
@@ -138,7 +138,7 @@
     }
 
     function playPause() {
-        var change = document.getElementById("button");
+        var change = document.getElementById('button');
         if (change.innerHTML == 'PLAY') {
             change.innerHTML = 'PAUSE';
             playNextNumber();
@@ -178,18 +178,22 @@
         let z = (cellw - context.measureText(num).width) / 2;
         context.fillText(num, x1 + z, y1 + cellh - 15);
         checked[num] = !checked[num];
-        countMarkedCells += 1;
-        // dissplay number in a pop up box 
+        // checked[num] ? ++countMarkedCells : --countMarkedCells; // if cell is unmarked then reduce the count
+        ++countMarkedCells;
+        document.getElementById('debug').innerHTML = countMarkedCells;
+        // display number in a pop up box 
         document.getElementById('popupbox').innerHTML = num;
         $("#popupbox").fadeIn();
         $("#popupbox").fadeOut(5000); //fade out in 5 seconds
         // speak the number using default browser language
         window.speechSynthesis.speak(new SpeechSynthesisUtterance(num));
         if (countMarkedCells < 90) {
+            // if all cells ae not marked cotinue the timer
             t = setTimeout(timedNextNumber, 7000); // 7 seconds
         } else {
+            // all cells are marked, game over. 
             document.getElementById('button').disabled = true;
-            document.getElementById('button').innerHTML = 'Game Over';
+            document.getElementById('button').innerHTML = 'Game Over!';
         }
     }
 
@@ -204,5 +208,4 @@
         clearTimeout(t);
         timer_is_on = false;
     }
-
 </script>

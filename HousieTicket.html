@@ -31,6 +31,8 @@
 </html>
 
 <script>
+    let version = "2.0.1";
+
     function setCookie(cname, cvalue, exdays) {
         var d = new Date();
         d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
@@ -77,12 +79,14 @@
         let cTime = current.getHours().pad(2) + ":" + current.getMinutes().pad(2) + ":" + current.getSeconds().pad(2);
         let dateTime = cDate + ' ' + cTime;
         let tktnum = String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90))
-        document.getElementById("footer").innerHTML = "Ticket #" + tktnum + " generated on: " + dateTime + ", (c) Murtuza Masalawala";
+        document.getElementById("footer").innerHTML = "Ticket #" + tktnum + " generated on: " + dateTime + ", (c) Murtuza Masalawala - ver:" + version;
         document.getElementById("info").innerHTML = "Tap on cell to mark Number, swipe on line to mark as complete."
             // setting canvas size. 
         var ticket = getTicket();
         var checked = initialiseArrays(28);
         var linedRow = initialiseArrays(3);
+        var lineColors = ["#46015E", "#F54901", "#C66BAE"];
+        var lineNames = ['First ', 'Second ', 'Last '];
         var x, y, z;
         var startX, startY;
 
@@ -191,14 +195,20 @@
                     z = (cellw - context.measureText(num).width) / 2;
                     context.fillText(num, x1 + z, y1 + cellh - 15);
                     checked[idx] = !checked[idx];
-                    // window.alert (checked[idx] + ", " + linedRow[i]);
+
+                    if (checkLineComplete(i)) {
+                        // mark the completed line and speak. 
+                        linedRow[i] = true;
+                        drawLine(i);
+                        window.speechSynthesis.speak(new SpeechSynthesisUtterance(lineNames + 'line is Complete!'));
+                    }
                     if (!checked[idx] && linedRow[i]) {
                         linedRow[i] = false;
                         resize();
                     }
                 }
             }
-        };
+        }
 
         function getTicket() {
             var tkt = [];
@@ -272,10 +282,10 @@
         }
 
 
-        function drawLine(i) {
+        function drawLine(row) {
             var lx1, ly1, lx2;
             lx1 = padx;
-            ly1 = (i * cellh) + (cellh / 2) + pady;
+            ly1 = (row * cellh) + (cellh / 2) + pady;
             lx2 = context.canvas.width - padx;
 
             var startX = lx1;
@@ -283,7 +293,8 @@
             var zigzagSpacing = 10;
 
             context.lineWidth = 4;
-            context.strokeStyle = "orange";
+            //context.strokeStyle = "orange";
+            context.strokeStyle = lineColors[row];
             context.beginPath();
             context.moveTo(startX, startY);
 
@@ -309,6 +320,20 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
+        function checkLineComplete(row) {
+            var flag = true;
+            var idx;
+
+            for (j = 0; j < 9; j++) {
+                idx = j * 3 + row;
+                if (!checked[idx] && ticket[idx] != 0) {
+                    flag = false;
+                    break;
+                }
+            }
+            return flag;
+        }
+
         window.addEventListener('load', function() {
 
                 var touchsurface = document.getElementById('myCanvas'),
@@ -319,6 +344,7 @@
                     elapsedTime,
                     startTime;
 
+
                 function handleswipe(isrightswipe) {
 
                     if (isrightswipe) {
@@ -327,22 +353,11 @@
                         y = startY;
 
                         if (checkPointinCanvas(x, y)) {
-                            i = Math.trunc((y - pady) / cellh);
+                            var row = Math.trunc((y - pady) / cellh);
 
-                            var flag = true;
-                            var idx;
-
-                            for (j = 0; j < 9; j++) {
-                                idx = j * 3 + i;
-                                if (!checked[idx] && ticket[idx] != 0) {
-                                    flag = false;
-                                    break;
-                                }
-                            }
-
-                            if (flag) {
-                                linedRow[i] = true;
-                                drawLine(i);
+                            if (checkLineComplete(row)) {
+                                linedRow[row] = true;
+                                drawLine(row);
                             }
                         }
 
