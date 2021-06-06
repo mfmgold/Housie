@@ -31,7 +31,7 @@
 </html>
 
 <script>
-    let version = "2.0.1";
+    let version = "2.0.2";
 
     function setCookie(cname, cvalue, exdays) {
         var d = new Date();
@@ -200,7 +200,8 @@
                         // mark the completed line and speak. 
                         linedRow[i] = true;
                         drawLine(i);
-                        window.speechSynthesis.speak(new SpeechSynthesisUtterance(lineNames + 'line is Complete!'));
+                        window.speechSynthesis.speak(new SpeechSynthesisUtterance(lineNames[i] + 'line is Complete!'));
+                        if (checkHousie()) window.speechSynthesis.speak(new SpeechSynthesisUtterance('Congratulations, Its a Housie!'));
                     }
                     if (!checked[idx] && linedRow[i]) {
                         linedRow[i] = false;
@@ -208,6 +209,17 @@
                     }
                 }
             }
+        }
+
+        function checkHousie() {
+            var flag = true;
+            for (let row = 0; row < 3; row++) {
+                if (!linedRow[row]) {
+                    flag = false;
+                    break;
+                }
+            }
+            return flag;
         }
 
         function getTicket() {
