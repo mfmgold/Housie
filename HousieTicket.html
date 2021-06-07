@@ -86,7 +86,7 @@
         var checked = initialiseArrays(28);
         var linedRow = initialiseArrays(3);
         var lineColors = ["#46015E", "#F54901", "#C66BAE"];
-        var lineNames = ['First ', 'Second ', 'Last '];
+        var lineNames = ['First', 'Second', 'Third'];
         var x, y, z;
         var startX, startY;
 
@@ -201,7 +201,7 @@
                         linedRow[i] = true;
                         drawLine(i);
                         window.speechSynthesis.speak(new SpeechSynthesisUtterance(lineNames[i] + 'line is Complete!'));
-                        if (checkHousie()) window.speechSynthesis.speak(new SpeechSynthesisUtterance('Congratulations, Its a Housie!'));
+                        if (checkHousie()) window.speechSynthesis.speak(new SpeechSynthesisUtterance('Congratulations, Its a Full Housie!'));
                     }
                     if (!checked[idx] && linedRow[i]) {
                         linedRow[i] = false;
