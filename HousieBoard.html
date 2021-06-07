@@ -85,11 +85,11 @@
         context.lineWidth = 3;
         let idx = 0;
         // draw board with numbers
-        for (col = 0; col < 9; col++) {
-            for (row = 0; row < 10; row++) {
+        for (row = 0; row < 9; row++) {
+            for (col = 0; col < 10; col++) {
                 idx++;
-                let x = row * cellw + padx;
-                let y = col * cellh + pady;
+                let x = col * cellw + padx;
+                let y = row * cellh + pady;
                 context.rect(x, y, cellw, cellh);
                 context.font = fontSize + 'px Arial';
                 let z = (cellw - context.measureText(idx).width) / 2;
