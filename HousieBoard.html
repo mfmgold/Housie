@@ -19,14 +19,22 @@
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="./src/shortcut.js"></script>
 </head>
 
-<body onresize="resize()">
-    <canvas id="myCanvas" style="border:1px solid red;"></canvas>
-    <button id='button' onclick="playPause();">PLAY</button>
-    <p style="font-size: 20px;color:black;position:absolute; top:95% " ; id='footer'></p>
-    <button id='popupbox'></button>
-</body>
+<body onresize="Resize()">
+    <canvas id="myCanvas" style="border:1px solid red;">
+        </canvas>
+    <button id='button' onclick="PlayPause();">PLAY
+        </button>
+    <p style="font-size: 20px;color:red;position:absolute; top:90%" ; id='lastnum'>
+    </p>
+    <p style="font-size: 13px;color:black;position:absolute; top:96%" ; id='footer'>
+    </p>
+    <button id='popupbox'>
+        </button>
+    </ body>
 
 </html>
-<script src="./src/housieboard.js"></script>
+<script src="./src/housieboard.js">
+</script>
