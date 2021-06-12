@@ -1,4 +1,4 @@
-let version = "2.0.2";
+let version = "2.0.3";
 
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
@@ -47,8 +47,8 @@ if (getCookie("tktgenerated") == "Yes") {
     let dateTime = cDate + ' ' + cTime;
     let tktnum = String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90))
     document.getElementById("footer").innerHTML = "Ticket #" + tktnum + " generated on: " + dateTime + ", (c) Murtuza Masalawala - ver:" + version;
-    document.getElementById("info").innerHTML = "Tap on cell to mark Number, swipe on line to mark as complete."
-        // setting canvas size. 
+
+    // setting canvas size. 
     var ticket = getTicket();
     var checked = initialiseArrays(28);
     var linedRow = initialiseArrays(3);
