@@ -46,7 +46,11 @@ if (getCookie("tktgenerated") == "Yes") {
     let cTime = current.getHours().pad(2) + ":" + current.getMinutes().pad(2) + ":" + current.getSeconds().pad(2);
     let dateTime = cDate + ' ' + cTime;
     let tktnum = String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90)) + String.fromCharCode(getRndInteger(65, 90))
+
     document.getElementById("footer").innerHTML = "Ticket #" + tktnum + " generated on: " + dateTime + ", (c) Murtuza Masalawala - ver:" + version;
+
+    //set the seed using ticketnum
+    new Math.seedrandom(tktnum);
 
     // setting canvas size. 
     var ticket = getTicket();
