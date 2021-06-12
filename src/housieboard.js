@@ -1,4 +1,4 @@
-let version = '2.0.2'; // update version here. 
+let version = '2.0.3'; // update version here. 
 
 Number.prototype.pad = function(size) {
     var s = String(this);
