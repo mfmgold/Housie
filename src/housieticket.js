@@ -1,4 +1,4 @@
-let version = "2.0.4";
+let version = "2.0.5";
 
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
@@ -27,8 +27,8 @@ if (getCookie("tktgenerated") == "Yes") {
     window.alert("A ticket has already generated!, close browser to reset.");
     document.getElementById("footer").innerHTML = "Sorry...";
     window.close();
-} else {
-    //setCookie("tktgenerated", "Yes", 0)
+} else { //go ahead and display the ticket.
+
     document.cookie = "tktgenerated=Yes";
 
     Number.prototype.pad = function(size) {
@@ -61,12 +61,16 @@ if (getCookie("tktgenerated") == "Yes") {
     var x, y, z;
     var startX, startY;
 
-    resize();
-
+    var colorMark = '#ffff00'; //yellow
+    var colorErase = '#fff9a6'; //'#ff6347' light yellow
+    var colorBlank = '#ffffff'; //white
+    var colorText = '#000000'; //black
+    var colorGrid = '#19b7f1';
     var canvas;
-    var context;
-    var padx, pady, cellw, cellh;
+    var ctx;
+    var padx = pady = 10;
 
+    var cellw, cellh;
 
     function initialiseArrays(size) {
         var arr = [];
@@ -76,26 +80,26 @@ if (getCookie("tktgenerated") == "Yes") {
         return arr;
     }
 
-    function resize() {
+    Resize();
+
+    function Resize() {
 
         canvas = document.getElementById('myCanvas');
-        context = canvas.getContext('2d');
+        ctx = canvas.getContext('2d');
 
         var screenWidth = document.documentElement.clientWidth - 10;
         var screenHeight = document.documentElement.clientHeight - 60;
 
-        context.clearRect(0, 0, screenWidth, screenHeight);
+        ctx.clearRect(0, 0, screenWidth, screenHeight);
 
         if (screenHeight > 360) {
             screenHeight = 360;
         }
-        context.canvas.width = screenWidth;
-        context.canvas.height = screenHeight;
-        context.lineWidth = 3;
-        context.strokeStyle = '#19B7F1';
+        ctx.canvas.width = screenWidth;
+        ctx.canvas.height = screenHeight;
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = colorGrid;
 
-        padx = 10;
-        pady = 10;
         cellw = (screenWidth - 2 * padx) / 9;
         cellh = (screenHeight - 2 * pady) / 3;
         var idx = 0;
@@ -104,25 +108,25 @@ if (getCookie("tktgenerated") == "Yes") {
             for (i = 0; i < 3; i++) {
                 x = j * cellw + padx;
                 y = i * cellh + pady;
-                context.lineWidth = 3;
-                context.strokeStyle = '#19B7F1';
-                context.rect(x, y, cellw, cellh);
-                context.stroke();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = colorGrid;
+                ctx.rect(x, y, cellw, cellh);
+                ctx.stroke();
                 if (checked[idx]) {
-                    context.fillStyle = "yellow";
-                    context.fillRect(x, y, cellw, cellh);
+                    ctx.fillStyle = colorMark;
+                    ctx.fillRect(x, y, cellw, cellh);
                 }
-                context.font = "40px Arial";
+                ctx.font = "40px Arial";
                 num = ticket[idx];
                 if (num == 0) num = '';
-                context.fillStyle = "black";
-                z = (cellw - context.measureText(num).width) / 2;
-                context.fillText(num, x + z, y + cellh - 15);
+                ctx.fillStyle = colorText;
+                z = (cellw - ctx.measureText(num).width) / 2;
+                ctx.fillText(num, x + z, y + cellh - 15);
                 idx++;
             }
         }
         // draw lines
-        context.stroke();
+        ctx.stroke();
         for (i = 0; i < 3; i++) {
             if (linedRow[i]) drawLine(i);
         }
@@ -155,27 +159,23 @@ if (getCookie("tktgenerated") == "Yes") {
             y1 = i * cellh + pady;
             idx = j * 3 + i;
             num = ticket[idx];
-            colorYellow = '#ffff00';
-            colorTomato = '#ff6347';
-            let data = context.getImageData(x1 + 4, y1 + 4, 1, 1).data;
-            //let rgb = [data[0], data[1], data[2]];
+            let data = ctx.getImageData(x1 + 4, y1 + 4, 1, 1).data;
             let cellColor = "#" + ((1 << 24) + (data[0] << 16) + (data[1] << 8) + data[2]).toString(16).slice(1);
 
             if (num != 0) {
                 if (checked[idx]) {
-                    if (cellColor == colorYellow) context.fillStyle = colorTomato // set color to tomato '
-                    else context.fillStyle = "white";
-
+                    if (cellColor == colorMark) ctx.fillStyle = colorErase // set color to indicate erase belfroe blanking it '
+                    else ctx.fillStyle = colorBlank;
                 } else {
-                    context.fillStyle = "yellow";
+                    ctx.fillStyle = colorMark;
                 }
 
-                if (context.fillStyle != colorTomato) checked[idx] = !checked[idx];
+                if (ctx.fillStyle != colorErase) checked[idx] = !checked[idx];
 
-                context.fillRect(x1 + 2, y1 + 2, cellw - 4, cellh - 4);
-                context.fillStyle = "black";
-                z = (cellw - context.measureText(num).width) / 2;
-                context.fillText(num, x1 + z, y1 + cellh - 15);
+                ctx.fillRect(x1 + 2, y1 + 2, cellw - 4, cellh - 4);
+                ctx.fillStyle = colorText;
+                z = (cellw - ctx.measureText(num).width) / 2;
+                ctx.fillText(num, x1 + z, y1 + cellh - 15);
 
                 if (checkLineComplete(i)) {
                     // mark the completed line and speak. 
@@ -186,7 +186,7 @@ if (getCookie("tktgenerated") == "Yes") {
                 }
                 if (!checked[idx] && linedRow[i]) {
                     linedRow[i] = false;
-                    resize();
+                    Resize();
                 }
             }
         }
@@ -279,17 +279,17 @@ if (getCookie("tktgenerated") == "Yes") {
         var lx1, ly1, lx2;
         lx1 = padx;
         ly1 = (row * cellh) + (cellh / 2) + pady;
-        lx2 = context.canvas.width - padx;
+        lx2 = ctx.canvas.width - padx;
 
         var startX = lx1;
         var startY = ly1;
         var zigzagSpacing = 10;
 
-        context.lineWidth = 4;
-        //context.strokeStyle = "orange";
-        context.strokeStyle = lineColors[row];
-        context.beginPath();
-        context.moveTo(startX, startY);
+        ctx.lineWidth = 4;
+
+        ctx.strokeStyle = lineColors[row];
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
 
         // draw ten lines
         n = 0;
@@ -302,10 +302,10 @@ if (getCookie("tktgenerated") == "Yes") {
             } else { // if n is odd...
                 y = startY;
             }
-            context.lineTo(x, y);
+            ctx.lineTo(x, y);
             n++;
         } while (x <= lx2 - zigzagSpacing);
-        context.stroke();
+        ctx.stroke();
 
     }
 
