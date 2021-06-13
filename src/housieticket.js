@@ -1,4 +1,4 @@
-let version = "2.0.3";
+let version = "2.0.4";
 
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
@@ -142,6 +142,7 @@ if (getCookie("tktgenerated") == "Yes") {
         return (x >= 0 && x < cellw * 9 && y >= 0 && y <= cellh * 3);
     }
 
+
     function markCell() {
         var x1, y1;
         var idx;
@@ -154,18 +155,27 @@ if (getCookie("tktgenerated") == "Yes") {
             y1 = i * cellh + pady;
             idx = j * 3 + i;
             num = ticket[idx];
+            colorYellow = '#ffff00';
+            colorTomato = '#ff6347';
+            let data = context.getImageData(x1 + 4, y1 + 4, 1, 1).data;
+            //let rgb = [data[0], data[1], data[2]];
+            let cellColor = "#" + ((1 << 24) + (data[0] << 16) + (data[1] << 8) + data[2]).toString(16).slice(1);
+            alert(cellColor);
             if (num != 0) {
                 if (checked[idx]) {
-                    context.fillStyle = "white";
+                    if (cellColor == colorYellow) context.fillStyle = colorTomato // set color to tomato '
+                    else context.fillStyle = "white";
+                    alert(context.fillStyle);
                 } else {
                     context.fillStyle = "yellow";
                 }
-                //context.lineWidth =0;
+
+                if (context.fillStyle != colorTomato) checked[idx] = !checked[idx];
+
                 context.fillRect(x1 + 2, y1 + 2, cellw - 4, cellh - 4);
                 context.fillStyle = "black";
                 z = (cellw - context.measureText(num).width) / 2;
                 context.fillText(num, x1 + z, y1 + cellh - 15);
-                checked[idx] = !checked[idx];
 
                 if (checkLineComplete(i)) {
                     // mark the completed line and speak. 
