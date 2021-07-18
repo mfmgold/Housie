@@ -19,7 +19,7 @@
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="./src/shortcut.js"></script>
+    <script src="./src/qrcode.js"></script>
 </head>
 
 <body onresize="Resize()">
@@ -27,14 +27,19 @@
         </canvas>
     <button id='button' onclick="PlayPause();">PLAY
         </button>
-    <p style="font-size: 20px;color:red;position:absolute; top:90%" ; id='lastnum'>
+    <button id='buttonQR' onclick="displayHousieTicketQRCode();">Housie Ticket QR Code
+        </button>
+    <p style="font-size: 20px;color:red;position:absolute; top:94%" ; id='lastnum'>
     </p>
     <p style="font-size: 13px;color:black;position:absolute; top:96%" ; id='footer'>
     </p>
-    <button id='popupbox'>
+    <button id='popupbox' onclick="hidePopupbox();">
+        </button>
+    <button id='popupboxQR' onclick="hidePopupboxQR();">
         </button>
     </ body>
 
 </html>
+
 <script src="./src/housieboard.js">
 </script>
