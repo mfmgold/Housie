@@ -1,4 +1,4 @@
-let version = '2.0.4'; // update version here. 
+let version = '2.0.5'; // update version here. 
 
 Number.prototype.pad = function(size) {
     var s = String(this);
@@ -27,8 +27,12 @@ for (idx = 0; idx < 90; idx++) {
     checked[idx] = false;
 }
 var lastNumber = document.getElementById('lastnum');
+
+//QR Code settings
 var sizeQRCode=256;
 var isQRDisplayed=false;
+let buttonQRFontSize = screenWidth => screenWidth/8 >300 ? 24 : 16;
+
 Resize();
 
 function Resize() {
@@ -40,8 +44,8 @@ function Resize() {
     let screenHeight = document.documentElement.clientHeight - 80; // consider size of button and footer. 
     context.canvas.width = screenWidth;
     context.canvas.height = screenHeight;
-    document.getElementById('button').style = "height:50px;width:300px;font-size: 24px;background-color: #19B7F1;border: 2px solid #008CBA;position:absolute;left:" + (((document.documentElement.clientWidth / 2 - 150) / document.documentElement.clientWidth) * 100) + "%;top:" + (((screenHeight / document.documentElement.clientHeight) * 100) + 1) + "%";
-    document.getElementById('buttonQR').style = "height:50px;width:300px;font-size: 24px;background-color: #19B7F1;border: 2px solid red;position:absolute;left:" + (((document.documentElement.clientWidth-320) / document.documentElement.clientWidth) * 100) + "%;top:" + (((screenHeight / document.documentElement.clientHeight) * 100) + 1) + "%";
+    document.getElementById('button').style = "height:40px;width:" +screenWidth/8 + "px;font-size: 24px;background-color: #19B7F1;border: 2px solid #008CBA;position:absolute;left:" + (((document.documentElement.clientWidth / 2 - 150) / document.documentElement.clientWidth) * 100) + "%;top:" + (((screenHeight / document.documentElement.clientHeight) * 100) + 1) + "%";
+    document.getElementById('buttonQR').style = "height:40px;width:" +screenWidth/8 + "px;font-size:" + buttonQRFontSize(screenWidth) + "px;background-color: #19B7F1;border: 2px solid red;position:absolute;left:" + (((document.documentElement.clientWidth-320) / document.documentElement.clientWidth) * 100) + "%;top:" + (((screenHeight / document.documentElement.clientHeight) * 100) + 1) + "%";
 
     // PopupBox settings
     document.getElementById('popupbox').style = "height:" + screenHeight / 4 + "px;width:" + screenWidth / 4 + "px;font-size: 72px;background-color: yellow;border: 2px solid #008CBA;position:absolute;left:" + (((document.documentElement.clientWidth / 2 - (screenWidth / 8)) / document.documentElement.clientWidth) * 100) + "%; top:" + (((document.documentElement.clientHeight / 2 - (screenHeight / 8)) / document.documentElement.clientHeight) * 100) + "%";
@@ -51,7 +55,6 @@ function Resize() {
     // PopupBoxQR settings
     sizeQRCode = screenWidth<screenHeight ?  Math.trunc(screenWidth/4-20):Math.trunc(screenHeight/4-20);
     document.getElementById('popupboxQR').style = "height:" + (sizeQRCode + 20) + "px;width:" + (sizeQRCode + 20) + "px;font-size: 72px;background-color: white;border: 2px solid #008CBA;position:absolute;left:" + (((document.documentElement.clientWidth / 2 - ((sizeQRCode + 20) / 2)) / document.documentElement.clientWidth) * 100) + "%; top:" + (((document.documentElement.clientHeight / 2 - ((sizeQRCode + 20) / 2)) / document.documentElement.clientHeight) * 100) + "%";
-    displayHousieTicketQRCode();
     $("#popupboxQR").fadeOut(1); // make it vanish immediately
 
     cellw = (screenWidth - 2 * padx) / 10;
