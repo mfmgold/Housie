@@ -31,7 +31,7 @@ var lastNumber = document.getElementById('lastnum');
 //QR Code settings
 var sizeQRCode=256;
 var isQRDisplayed=false;
-let buttonQRFontSize = screenWidth => screenWidth/8 >300 ? 24 : 16;
+let buttonQRFontSize = screenWidth => screenWidth/8 >300 ? 24 : 14;
 
 Resize();
 
@@ -53,16 +53,18 @@ function Resize() {
     $("#popupbox").fadeOut(1); // make it vanish immediately
 
     // PopupBoxQR settings
-    sizeQRCode = screenWidth<screenHeight ?  Math.trunc(screenWidth/4-20):Math.trunc(screenHeight/4-20);
+    sizeQRCode = screenWidth<screenHeight ?  2 * Math.round((screenWidth/4-20)/2):2 * Math.round((screenHeight/4-20)/2); //Rounding off to an even number, no particluar reason
+    
     document.getElementById('popupboxQR').style = "height:" + (sizeQRCode + 20) + "px;width:" + (sizeQRCode + 20) + "px;background-color: white;border: 2px solid #008CBA;position:absolute;left:" + (((document.documentElement.clientWidth / 2 - ((sizeQRCode + 20) / 2)) / document.documentElement.clientWidth) * 100) + "%; top:" + (((document.documentElement.clientHeight / 2 - ((sizeQRCode + 20) / 2)) / document.documentElement.clientHeight) * 100) + "%";
     $("#popupboxQR").fadeOut(1); // make it vanish immediately
-
+    
     cellw = (screenWidth - 2 * padx) / 10;
     cellh = (screenHeight - 2 * pady) / 9;
     context.lineWidth = 3;
     context.strokeStyle = '#19B7F1';
     let idx = 0;
     // draw board with numbers
+    
     for (row = 0; row < 9; row++) {
         for (col = 0; col < 10; col++) {
             idx++;
@@ -81,6 +83,7 @@ function Resize() {
             context.fillText(idx, x + z, y + cellh - 15);
         }
     }
+    
 }
 
 canvas.onclick = function(event) {
@@ -216,7 +219,7 @@ function displayHousieTicketQRCode() {
         hidePopupboxQR();
     } else {
         isQRDisplayed=true;
-        document.getElementById("popupboxQR").innerHTML="";
+        document.getElementById("popupboxQR").innerHTML='';
         new QRCode(document.getElementById("popupboxQR"), {
             text: "http://housieticket.ml",
             width: sizeQRCode,
