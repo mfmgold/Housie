@@ -1,4 +1,4 @@
-let version = '2.0.5'; // update version here. 
+let version = '2.0.6'; // update version here. 
 
 Number.prototype.pad = function(size) {
     var s = String(this);
@@ -179,7 +179,7 @@ function timedNextNumber() {
     window.speechSynthesis.speak(new SpeechSynthesisUtterance(num));
     lastNumber.innerHTML = 'Last number was : ' + num;
     if (countMarkedCells < 90) {
-        // if all cells ae not marked cotinue the timer
+        // if all cells ae not marked continue the timer
         t = setTimeout(timedNextNumber, 7000); // 7 seconds
     } else {
         // all cells are marked, game over. 
@@ -221,8 +221,8 @@ function displayHousieTicketQRCode() {
         isQRDisplayed=true;
         document.getElementById("popupboxQR").innerHTML='';
         new QRCode(document.getElementById("popupboxQR"), {
-            text: "http://housieticket.ml",
-            width: sizeQRCode,
+            text: "https://murtuza.neocities.org/housie-ticket/",
+            width: sizeQRCode+4,
             height: sizeQRCode,
             colorDark : "#000000",
             colorLight : "#ffffff",
